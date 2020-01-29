@@ -8,23 +8,32 @@ const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-l
 const nlu = new NaturalLanguageUnderstandingV1({
     iam_apikey: watsonApiKey,
     version: '2018-04-05',
-    url: "https://gateway-syd.watsonplatform.net/natural-language-understanding/api"
+    url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
 })
 
-async function robot(content) {
+const state = require('./state.js')
+
+async function robot() {
+    console.log('> [text-robot] Starting...')
+    const content = state.load()
+
     await fetchContentFromWikipedia(content)
     sanitizeContent(content)
     breakContentIntoSentences(content)
-    limitMaximumStences(content)
+    limitMaximumSentences(content)
     await fetchKeywordsOfAllSentences(content)
 
+    state.save(content)
+
     async function fetchContentFromWikipedia(content) {
+        console.log('> [text-robot] Fetching content from Wikipedia')
         const algorithmiaAuthenticated = algorithmia(algorithmiaApiKey)
         const wikipediaAlgorithm = algorithmiaAuthenticated.algo('web/WikipediaParser/0.1.2')
         const wikipediaResponse = await wikipediaAlgorithm.pipe(content.searchTerm)
         const wikipediaContent = wikipediaResponse.get()
 
         content.sourceContentOriginal = wikipediaContent.content
+        console.log('> [text-robot] Fetching done!')
     }
 
     function sanitizeContent(content) {
@@ -65,13 +74,19 @@ async function robot(content) {
         })
     }
 
-    function limitMaximumStences(content) {
+    function limitMaximumSentences(content) {
         content.sentences = content.sentences.slice(0, content.maximumSentences)
     }
 
     async function fetchKeywordsOfAllSentences(content) {
+        console.log('> [text-robot] Starting to fetch keywords from Watson')
+
         for (const sentence of content.sentences) {
+            console.log(`> [text-robot] Sentence: "${sentence.text}"`)
+
             sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text)
+
+            console.log(`> [text-robot] Keywords: ${sentence.keywords.join(', ')}\n`)
         }
     }
 
@@ -97,9 +112,6 @@ async function robot(content) {
         })
     }
 
-
-
-
-
 }
+
 module.exports = robot
