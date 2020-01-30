@@ -27,6 +27,7 @@ async function robot() {
             auth: googleSearchCredentials.apiKey,
             cx: googleSearchCredentials.searchEngineId,
             q: query,
+            imgSize: 'huge',
             searchType: 'image',
             num: 2
         })
