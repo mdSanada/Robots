@@ -4,7 +4,8 @@ const robots = {
     text: require('./robots/text.js'),
     input: require('./robots/input.js'),
     state: require('./robots/state.js'),
-    image: require('./robots/images.js')
+    image: require('./robots/images.js'),
+    video: require('./robots/video.js')
 }
 
 async function start() {
@@ -12,11 +13,13 @@ async function start() {
     //await robots.text(content)
 
     //console.log(JSON.stringify(content, null, 4))
-    robots.input()
-    await robots.text()
-    await robots.image()
+    //robots.input()
+    //await robots.text()
+    //await robots.image()
+    await robots.video()
 
     const content = robots.state.load()
     console.dir(content, { depth: null })
 }
+
 start()
