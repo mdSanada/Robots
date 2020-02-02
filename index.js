@@ -15,8 +15,8 @@ async function start() {
     //console.log(JSON.stringify(content, null, 4))
     //robots.input()
     //await robots.text()
-    //await robots.image()
-    await robots.video()
+    await robots.image()
+        //await robots.video()
 
     const content = robots.state.load()
     console.dir(content, { depth: null })
